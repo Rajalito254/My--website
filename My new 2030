@@ -1,0 +1,855 @@
+
+html_code = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chartify AI - Advanced Trading Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+    <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0a0a0f;
+            --bg-card: #16161e;
+            --bg-hover: #1e1e2e;
+            --text-primary: #ffffff;
+            --text-secondary: #9ca3af;
+            --border: #2a2a3a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Scanning Animation Overlay */
+        .scan-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 15, 0.95);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .scan-overlay.active {
+            display: flex;
+        }
+
+        .scan-circle {
+            width: 200px;
+            height: 200px;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            position: relative;
+            animation: pulse-scan 2s infinite;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--primary), transparent);
+            animation: scan-move 2s linear infinite;
+            transform: translateX(-50%);
+        }
+
+        .scan-text {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary);
+            animation: blink 1s infinite;
+        }
+
+        .scan-details {
+            color: var(--text-secondary);
+            font-size: 14px;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        @keyframes pulse-scan {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+        }
+
+        @keyframes scan-move {
+            0% { transform: translateX(-50%) rotate(0deg); }
+            100% { transform: translateX(-50%) rotate(360deg); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .logo-text h1 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5558e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        /* Main Layout */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Chart Section */
+        .chart-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .chart-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .asset-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .asset-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .asset-details h2 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .asset-details .price {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        .asset-details .change {
+            font-size: 14px;
+            color: var(--success);
+            margin-left: 8px;
+        }
+
+        .timeframes {
+            display: flex;
+            gap: 8px;
+        }
+
+        .timeframe {
+            padding: 6px 12px;
+            border-radius: 6px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .timeframe.active, .timeframe:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .chart-container {
+            height: 500px;
+            position: relative;
+            padding: 20px;
+        }
+
+        #tradingChart {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Upload Area */
+        .upload-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 2px dashed var(--border);
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-section:hover {
+            border-color: var(--primary);
+            background: var(--bg-hover);
+        }
+
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--bg-hover);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+        }
+
+        .upload-section h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .upload-section p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Analysis Panel */
+        .analysis-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .signal-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .signal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .signal-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .signal-badge.long {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .signal-badge.short {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .confidence {
+            text-align: right;
+        }
+
+        .confidence-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .confidence-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .trading-levels {
+            padding: 20px;
+        }
+
+        .level-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: var(--bg-hover);
+            border-radius: 12px;
+            border-left: 4px solid;
+            transition: all 0.3s;
+        }
+
+        .level-item:hover {
+            transform: translateX(4px);
+        }
+
+        .level-item.entry { border-left-color: var(--info); }
+        .level-item.stop { border-left-color: var(--danger); }
+        .level-item.target { border-left-color: var(--success); }
+        .level-item.exit { border-left-color: var(--warning); }
+
+        .level-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-size: 18px;
+        }
+
+        .level-item.entry .level-icon { background: rgba(59, 130, 246, 0.2); }
+        .level-item.stop .level-icon { background: rgba(239, 68, 68, 0.2); }
+        .level-item.target .level-icon { background: rgba(16, 185, 129, 0.2); }
+        .level-item.exit .level-icon { background: rgba(245, 158, 11, 0.2); }
+
+        .level-info {
+            flex: 1;
+        }
+
+        .level-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .level-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .level-pips {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .risk-reward {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--bg-hover);
+            border-top: 1px solid var(--border);
+        }
+
+        .rr-item {
+            text-align: center;
+        }
+
+        .rr-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .rr-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .rr-value.positive { color: var(--success); }
+        .rr-value.negative { color: var(--danger); }
+
+        /* Analysis Details */
+        .details-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 20px;
+        }
+
+        .details-card h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .indicator-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .indicator-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg-hover);
+            border-radius: 8px;
+        }
+
+        .indicator-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .indicator-status {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .indicator-status.bullish {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .indicator-status.bearish {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .indicator-status.neutral {
+            background: rgba(156, 163, 175, 0.2);
+            color: var(--text-secondary);
+        }
+
+        /* Action Buttons */
+        .action-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-large {
+            padding: 16px;
+            font-size: 16px;
+            justify-content: center;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* History Section */
+        .history-section {
+            margin-top: 24px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 20px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-hover);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            background: var(--border);
+        }
+
+        .history-asset {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .history-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .history-info h4 {
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .history-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .history-result {
+            text-align: right;
+        }
+
+        .history-pnl {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .history-pnl.profit {
+            color: var(--success);
+        }
+
+        .history-pnl.loss {
+            color: var(--danger);
+        }
+
+        .history-time {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 16px;
+            }
+
+            .chart-container {
+                height: 350px;
+            }
+
+            .action-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Scanning Overlay -->
+    <div class="scan-overlay" id="scanOverlay">
+        <div class="scan-circle">
+            <div class="scan-line"></div>
+        </div>
+        <div class="scan-text">AI Analyzing Chart...</div>
+        <div class="scan-details">
+            Detecting patterns • Calculating levels • Verifying signals
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">C</div>
+            <div class="logo-text">
+                <h1>Chartify AI</h1>
+                <p>Professional Trading Analysis</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
+                <span>📁</span> Upload Chart
+            </button>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
+            <button class="btn btn-primary" onclick="startAnalysis()">
+                <span>🔍</span> Scan & Analyze
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Column -->
+        <div class="left-column">
+            <!-- Upload Section (shown when no chart) -->
+            <div class="upload-section" id="uploadSection" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📊</div>
+                <h3>Upload Trading Chart</h3>
+                <p>Support: PNG, JPG, WEBP • Max 10MB</p>
+            </div>
+
+            <!-- Chart Section (hidden initially) -->
+            <div class="chart-section" id="chartSection" style="display: none;">
+                <div class="chart-header">
+                    <div class="asset-info">
+                        <div class="asset-icon">₿</div>
+                        <div class="asset-details">
+                            <h2>BTC/USDT</h2>
+                            <div>
+                                <span class="price" id="currentPrice">$67,245.00</span>
+                                <span class="change">+2.45%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeframes">
+                        <button class="timeframe">1H</button>
+                        <button class="timeframe active">4H</button>
+                        <button class="timeframe">1D</button>
+                        <button class="timeframe">1W</button>
+                    </div>
+                </div>
+                <div class="chaLevel	Purpose	Example Value	
+🎯 Entry Point	Where to enter the trade	133.50	
+🛑 Stop Loss	Maximum risk/protection	131.20 (-230 pips)	
+✅ Take Profit	Target profit level	138.50 (+500 pips)	
+🚪 Exit Point	Trailing stop/Break-even	136.80	
+// Binance API (Free, no API key needed)
+const BINANCE_API = 'https://api.binance.com/api/v3';
+
+async function getBitcoinPrice() {
+    const response = await fetch(`${BINANCE_API}/ticker/price?symbol=BTCUSDT`);
+    const data = await response.json();
+    return data.price; // Real BTC price!
+}
+
+// Get candlestick data
+async function getCandles(symbol = 'BTCUSDT', interval = '1h') {
+    const response = await fetch(
+        `${BINANCE_API}/klines?symbol=${symbol}&interval=${interval}&limit=100`
+    );
+    return await response.json();
+}
+// Backend (Node.js server required)
+const OpenAI = require('openai');
+const openai = new OpenAI({ apiKey: 'your-api-key' });
+
+// Send chart image to AI for analysis
+async function analyzeChart(imageBase64) {
+    const response = await openai.chat.completions.create({
+        model: "gpt-4-vision-preview",
+        messages: [{
+            role: "user",
+            content: [
+                { type: "text", text: "Analyze this trading chart. Provide entry point, stop loss, take profit." },
+                { type: "image_url", image_url: { url: imageBase64 } }
+            ]
+        }]
+    });
+    return response.choices[0].message.content;
+}
+<!-- Add this library -->
+<script src="https://cdn.jsdelivr.net/npm/technicalindicators@3.1.0/dist/technicalindicators.min.js"></script>
+
+<script>
+// Calculate RSI
+const rsi = RSI.calculate({
+    values: closingPrices,
+    period: 14
+});
+
+// Calculate MACD
+const macd = MACD.calculate({
+    values: closingPrices,
+    fastPeriod: 12,
+    slowPeriod: 26,
+    signalPeriod: 9,
+    SimpleMAOscillator: false,
+    SimpleMASignal: false
+});
+</script>
+<!-- Add Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+
+<script>
+// Initialize Firebase (free tier)
+const firebaseConfig = {
+    apiKey: "your-api-key",
+    authDomain: "your-project.firebaseapp.com",
+    projectId: "your-project"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+// Save analysis to user history
+async function saveAnalysis(userId, analysisData) {
+    await firebase.firestore()
+        .collection('users')
+        .doc(userId)
+        .collection('analyses')
+        .add({
+            ...analysisData,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+}
+</script>
+<div style="background: #1a1a2e; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0;">
+    <strong>⚠️ Risk Warning:</strong> Trading involves substantial risk of loss. 
+    Past performance is not indicative of future results. This tool is for educational 
+    purposes only and does not constitute financial advice. Always consult a licensed 
+    financial advisor before making investment decisions.
+</div>
