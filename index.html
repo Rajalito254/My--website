@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chartify AI \u2014 Professional Trading Analysis</title>
+<title>Chartify AI — Professional Trading Analysis</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -174,4 +174,511 @@ header{position:sticky;top:0;z-index:200;background:rgba(4,8,16,0.95);backdrop-f
 
 /* MARKETS */
 .msearch{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:12px;}
-.msearch input{flex:1;background:none;border:none;outline:none;color:var(--text
+.msearch input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;}
+.msearch input::placeholder{color:var(--muted);}
+.mfilters{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;}
+.mfilters::-webkit-scrollbar{display:none;}
+.mfbtn{padding:6px 14px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:var(--muted2);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:'Outfit',sans-serif;}
+.mfbtn.on{background:rgba(0,229,255,0.1);border-color:var(--accent);color:var(--accent);}
+.mklist{display:flex;flex-direction:column;gap:8px;}
+.mkrow{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all 0.2s;}
+.mkrow:hover{border-color:var(--border2);transform:translateX(2px);}
+.mkl{display:flex;align-items:center;gap:12px;}
+.mkico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--card2);border:1px solid var(--border);}
+.mksym{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;}
+.mknm{font-size:11px;color:var(--muted);}
+.mkr{text-align:right;}
+.mkp{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;margin-bottom:3px;}
+.mkch{font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;}
+.cup{background:rgba(0,230,118,0.1);color:var(--green);}
+.cdn{background:rgba(255,23,68,0.1);color:var(--red);}
+.mkvol{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* HISTORY */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.sbox{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;}
+.sbox-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.sbox-ico{font-size:18px;}
+.sval{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;margin-bottom:2px;}
+.slbl{font-size:11px;color:var(--muted);}
+.hlist{display:flex;flex-direction:column;gap:8px;}
+.hitem{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;animation:rise 0.3s ease;}
+.hside{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;}
+.hlong{background:rgba(0,230,118,0.15);color:var(--green);border:1px solid rgba(0,230,118,0.3);}
+.hshort{background:rgba(255,23,68,0.15);color:var(--red);border:1px solid rgba(255,23,68,0.3);}
+.hinfo{flex:1;}
+.hpair{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;}
+.hmeta{font-size:11px;color:var(--muted);margin-top:2px;}
+.hpnl{text-align:right;}
+.hpnlv{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;}
+.hent{font-size:10px;color:var(--muted);margin-top:2px;}
+.empty{text-align:center;padding:50px 20px;color:var(--muted);}
+.empty span{font-size:48px;display:block;margin-bottom:12px;}
+
+/* SETTINGS */
+.stitle{font-size:13px;font-weight:700;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.srow{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;}
+.srl{display:flex;align-items:center;gap:10px;}
+.sri{font-size:18px;}
+.srn{font-size:13px;font-weight:600;}
+.srd{font-size:11px;color:var(--muted);margin-top:2px;}
+.tg{width:44px;height:24px;border-radius:12px;background:var(--border2);cursor:pointer;position:relative;transition:all 0.2s;flex-shrink:0;}
+.tg.on{background:var(--accent2);}
+.tg::after{content:'';position:absolute;width:18px;height:18px;border-radius:9px;background:white;top:3px;left:3px;transition:all 0.2s;}
+.tg.on::after{left:23px;}
+.ainput{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;transition:border-color 0.2s;}
+.ainput:focus{border-color:var(--accent);}
+.albl{font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;}
+.ver{text-align:center;font-size:11px;color:var(--muted);padding:20px;font-family:'JetBrains Mono',monospace;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:12px 20px;font-size:13px;font-weight:600;transition:transform 0.3s ease;z-index:999;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+.toast.on{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <div class="logo">
+      <div class="logo-mark">📊</div>
+      <div class="logo-txt">Chartify <span>AI</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="live-pill"><div class="ldot"></div>LIVE</div>
+    </div>
+  </div>
+</header>
+
+<div class="ticker"><div class="tick-track" id="ticker"></div></div>
+
+<div class="tabs">
+  <button class="tab on" onclick="goTab('analyze')" id="t-analyze"><span class="ti2">🔍</span>Analyze</button>
+  <button class="tab" onclick="goTab('markets')" id="t-markets"><span class="ti2">💹</span>Markets</button>
+  <button class="tab" onclick="goTab('history')" id="t-history"><span class="ti2">📋</span>History</button>
+  <button class="tab" onclick="goTab('settings')" id="t-settings"><span class="ti2">⚙️</span>Settings</button>
+</div>
+
+<div class="page">
+
+<!-- ANALYZE -->
+<div class="panel on" id="p-analyze">
+  <div class="lbl">Select Market</div>
+  <div class="pair-grid" id="pgrid"></div>
+
+  <div class="lbl">Timeframe</div>
+  <div class="tf-row">
+    <button class="tf" onclick="setTF(this,'1M')">1M</button>
+    <button class="tf" onclick="setTF(this,'5M')">5M</button>
+    <button class="tf" onclick="setTF(this,'15M')">15M</button>
+    <button class="tf on" onclick="setTF(this,'1H')">1H</button>
+    <button class="tf" onclick="setTF(this,'4H')">4H</button>
+    <button class="tf" onclick="setTF(this,'1D')">1D</button>
+  </div>
+
+  <div class="lbl">Upload Chart</div>
+  <div class="upload" id="uz" onclick="document.getElementById('fi').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="onDrop(event)">
+    <input type="file" id="fi" accept="image/*" onchange="onFile(event)">
+    <div class="rm" id="rm" onclick="rmImg(event)">✕</div>
+    <div style="font-size:40px;margin-bottom:10px;">📷</div>
+    <div style="font-size:15px;font-weight:700;margin-bottom:4px;">Upload Trading Chart</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Drag & drop or tap to browse</div>
+    <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+      <span style="padding:3px 8px;background:var(--card2);border:1px solid var(--border);border-radius:4px;font-size:10px;color:var(--muted2);font-family:'JetBrains Mono',monospace;">PNG</span>
+      <span style="padding:3px 8px;background:var(--card2);border:1px solid var(--border);border-radius:4px;font-size:10px;color:var(--muted2);font-family:'JetBrains Mono',monospace;">JPG</span>
+      <span style="padding:3px 8px;background:var(--card2);border:1px solid var(--border);border-radius:4px;font-size:10px;color:var(--muted2);font-family:'JetBrains Mono',monospace;">WEBP</span>
+      <span style="padding:3px 8px;background:var(--card2);border:1px solid var(--border);border-radius:4px;font-size:10px;color:var(--muted2);font-family:'JetBrains Mono',monospace;">Max 10MB</span>
+    </div>
+    <img id="prev" alt="preview">
+  </div>
+
+  <div class="lbl">Analysis Options</div>
+  <div class="opts">
+    <div class="opt on" onclick="this.classList.toggle('on')"><span style="font-size:16px;">📈</span><span class="opt-lbl">Technical</span><div class="tgl"></div></div>
+    <div class="opt on" onclick="this.classList.toggle('on')"><span style="font-size:16px;">🎯</span><span class="opt-lbl">S/R Levels</span><div class="tgl"></div></div>
+    <div class="opt on" onclick="this.classList.toggle('on')"><span style="font-size:16px;">⚖️</span><span class="opt-lbl">Risk Mgmt</span><div class="tgl"></div></div>
+    <div class="opt" onclick="this.classList.toggle('on')"><span style="font-size:16px;">📰</span><span class="opt-lbl">Sentiment</span><div class="tgl"></div></div>
+  </div>
+
+  <button class="scan" id="scanBtn" onclick="runScan()">🔍 Scan &amp; Analyze Chart</button>
+
+  <div class="loader" id="loader">
+    <div class="ldr-card">
+      <div class="ring"></div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Analyzing Chart...</div>
+      <div style="font-size:12px;color:var(--muted);">AI scanning patterns &amp; indicators</div>
+      <div class="steps">
+        <div class="step" id="s1"><div class="sdot"></div>Loading chart image</div>
+        <div class="step" id="s2"><div class="sdot"></div>Detecting chart patterns</div>
+        <div class="step" id="s3"><div class="sdot"></div>Calculating indicators (RSI, MACD, EMA)</div>
+        <div class="step" id="s4"><div class="sdot"></div>Computing risk management levels</div>
+        <div class="step" id="s5"><div class="sdot"></div>Generating AI signal</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="result" id="result">
+    <div class="sig-card" id="sigCard">
+      <div class="sig-top">
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">AI SIGNAL</div>
+          <div class="sig-name" id="sigName">BUY</div>
+          <div style="font-size:12px;color:var(--muted2);margin-top:2px;" id="sigMeta">BTC/USDT • 1H</div>
+        </div>
+        <div class="conf-wrap">
+          <div class="conf-num" id="confNum">84%</div>
+          <div class="conf-lbl">Confidence</div>
+        </div>
+      </div>
+      <div class="cbar"><div class="cfill" id="cfill" style="width:84%"></div></div>
+      <div class="sig-tags">
+        <span class="stag stag-blue" id="tagTF">1H</span>
+        <span class="stag stag-purple" id="tagPat">Bull Flag</span>
+        <span class="stag stag-green" id="tagTrend">Uptrend</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:12px;font-weight:700;color:var(--muted2);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">📍 Key Price Levels</div>
+      <div class="lvl-row">
+        <div class="lvl-l"><div class="lvl-dot" style="background:var(--accent2)"></div><div class="lvl-lbl">Entry Price</div></div>
+        <div class="lvl-r"><div class="lvl-val" id="lvlEntry">—</div><span class="badge" style="background:rgba(123,97,255,0.1);color:var(--accent2);">NOW</span></div>
+      </div>
+      <div class="lvl-row">
+        <div class="lvl-l"><div class="lvl-dot" style="background:var(--green)"></div><div class="lvl-lbl">Take Profit 1</div></div>
+        <div class="lvl-r"><div class="lvl-val up" id="lvlTP1">—</div><span class="badge" style="background:rgba(0,230,118,0.1);color:var(--green);">TP1</span></div>
+      </div>
+      <div class="lvl-row">
+        <div class="lvl-l"><div class="lvl-dot" style="background:#00ff9f"></div><div class="lvl-lbl">Take Profit 2</div></div>
+        <div class="lvl-r"><div class="lvl-val up" id="lvlTP2">—</div><span class="badge" style="background:rgba(0,230,118,0.1);color:var(--green);">TP2</span></div>
+      </div>
+      <div class="lvl-row">
+        <div class="lvl-l"><div class="lvl-dot" style="background:var(--red)"></div><div class="lvl-lbl">Stop Loss</div></div>
+        <div class="lvl-r"><div class="lvl-val dn" id="lvlSL">—</div><span class="badge" style="background:rgba(255,23,68,0.1);color:var(--red);">SL</span></div>
+      </div>
+    </div>
+
+    <div class="lbl">Technical Indicators</div>
+    <div class="ind-grid">
+      <div class="ind"><div class="ind-name">RSI (14)</div><div class="ind-val" id="iRSI">—</div><span class="pill" id="pRSI">—</span></div>
+      <div class="ind"><div class="ind-name">MACD</div><div class="ind-val" id="iMACD">—</div><span class="pill" id="pMACD">—</span></div>
+      <div class="ind"><div class="ind-name">EMA 20/50</div><div class="ind-val" id="iEMA">—</div><span class="pill" id="pEMA">—</span></div>
+      <div class="ind"><div class="ind-name">Volume</div><div class="ind-val" id="iVol">—</div><span class="pill" id="pVol">—</span></div>
+      <div class="ind"><div class="ind-name">Bollinger</div><div class="ind-val" id="iBB">—</div><span class="pill" id="pBB">—</span></div>
+      <div class="ind"><div class="ind-name">Stochastic</div><div class="ind-val" id="iStoch">—</div><span class="pill" id="pStoch">—</span></div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:12px;font-weight:700;color:var(--muted2);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">⚖️ Risk Management</div>
+      <div class="risk-grid">
+        <div class="ri"><div class="ri-lbl">Risk/Reward</div><div class="ri-val up" id="rr">1:2.4</div></div>
+        <div class="ri"><div class="ri-lbl">Risk %</div><div class="ri-val" id="rpct">1.8%</div></div>
+        <div class="ri"><div class="ri-lbl">Risk Level</div><div class="ri-val" id="rlvl">Medium</div></div>
+      </div>
+      <div class="rbar"><div class="rb-inner" id="rbar" style="width:60%;background:var(--gold)"></div></div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:12px;font-weight:700;color:var(--muted2);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">🤖 AI Analysis</div>
+      <div style="font-size:13px;color:var(--muted2);line-height:1.7;" id="aiText"></div>
+    </div>
+
+    <div class="tbns">
+      <button class="tbn tbn-long" onclick="doTrade('LONG')">▲ Go Long<small>Enter Buy Position</small></button>
+      <button class="tbn tbn-short" onclick="doTrade('SHORT')">▼ Go Short<small>Enter Sell Position</small></button>
+      <button class="tbn-save" onclick="saveSig()">💾 Save Analysis to History</button>
+    </div>
+  </div>
+</div>
+
+<!-- MARKETS -->
+<div class="panel" id="p-markets">
+  <div class="msearch"><span>🔍</span><input type="text" placeholder="Search markets..." oninput="filterMkts(this.value)"></div>
+  <div class="mfilters">
+    <button class="mfbtn on" onclick="setMF(this,'all')">All</button>
+    <button class="mfbtn" onclick="setMF(this,'crypto')">Crypto</button>
+    <button class="mfbtn" onclick="setMF(this,'forex')">Forex</button>
+    <button class="mfbtn" onclick="setMF(this,'metals')">Metals</button>
+  </div>
+  <div class="mklist" id="mklist"></div>
+</div>
+
+<!-- HISTORY -->
+<div class="panel" id="p-history">
+  <div class="stats-grid">
+    <div class="sbox"><div class="sbox-top"><span class="sbox-ico">💰</span><span class="pill bull" id="pnlBadge">+0%</span></div><div class="sval" id="tPnl" style="color:var(--green)">+$0.00</div><div class="slbl">Total P&L</div></div>
+    <div class="sbox"><div class="sbox-top"><span class="sbox-ico">🎯</span></div><div class="sval" id="wRate" style="color:var(--accent)">0%</div><div class="slbl">Win Rate</div></div>
+    <div class="sbox"><div class="sbox-top"><span class="sbox-ico">📊</span></div><div class="sval" id="tTrades">0</div><div class="slbl">Total Trades</div></div>
+    <div class="sbox"><div class="sbox-top"><span class="sbox-ico">🏆</span></div><div class="sval" id="bestT" style="color:var(--gold)">$0</div><div class="slbl">Best Trade</div></div>
+  </div>
+  <div class="lbl">Trade Log</div>
+  <div class="hlist" id="hlist">
+    <div class="empty"><span>📭</span><p>No trades yet.<br>Analyze a chart to get started.</p></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="panel" id="p-settings">
+  <div style="margin-bottom:20px;">
+    <div class="stitle">🤖 AI Configuration</div>
+    <div class="card">
+      <div class="albl">AI Model</div>
+      <select class="ainput" style="cursor:pointer;">
+        <option>Claude 3.5 Sonnet (Recommended)</option>
+        <option>GPT-4 Vision</option>
+        <option>Gemini Pro Vision</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="albl">API Key (Optional)</div>
+      <input class="ainput" type="password" placeholder="sk-ant-...">
+    </div>
+  </div>
+  <div style="margin-bottom:20px;">
+    <div class="stitle">📊 Preferences</div>
+    <div class="srow"><div class="srl"><span class="sri">🎯</span><div><div class="srn">Auto-detect Pattern</div><div class="srd">AI identifies patterns automatically</div></div></div><div class="tg on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="srow"><div class="srl"><span class="sri">🔔</span><div><div class="srn">Signal Alerts</div><div class="srd">Notify on strong signals</div></div></div><div class="tg on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="srow"><div class="srl"><span class="sri">💰</span><div><div class="srn">Risk Management</div><div class="srd">Show position sizing suggestions</div></div></div><div class="tg on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="srow"><div class="srl"><span class="sri">🌙</span><div><div class="srn">Dark Mode</div><div class="srd">Always on for trading</div></div></div><div class="tg on"></div></div>
+  </div>
+  <div style="margin-bottom:20px;">
+    <div class="stitle">⚠️ Risk Disclaimer</div>
+    <div class="card"><p style="font-size:12px;color:var(--muted);line-height:1.7;">Chartify AI provides analysis for educational purposes only. Trading involves significant risk of loss. Past performance does not guarantee future results. Always do your own research.</p></div>
+  </div>
+  <div class="ver">Chartify AI v2.0 • Professional Trading Analysis</div>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MKTS=[
+  {s:'BTC/USDT',n:'Bitcoin',i:'₿',p:67245,c:2.45,v:'$42.1B',cat:'crypto'},
+  {s:'ETH/USDT',n:'Ethereum',i:'Ξ',p:3521,c:1.87,v:'$18.3B',cat:'crypto'},
+  {s:'SOL/USDT',n:'Solana',i:'◎',p:178.4,c:-0.93,v:'$4.2B',cat:'crypto'},
+  {s:'BNB/USDT',n:'BNB',i:'B',p:412.3,c:0.64,v:'$1.8B',cat:'crypto'},
+  {s:'XRP/USDT',n:'Ripple',i:'✕',p:0.6234,c:3.21,v:'$3.1B',cat:'crypto'},
+  {s:'DOGE/USDT',n:'Dogecoin',i:'Ð',p:0.1623,c:5.44,v:'$2.1B',cat:'crypto'},
+  {s:'EUR/USD',n:'Euro/Dollar',i:'€',p:1.0842,c:-0.12,v:'$580B',cat:'forex'},
+  {s:'GBP/USD',n:'Pound/Dollar',i:'£',p:1.2634,c:0.08,v:'$310B',cat:'forex'},
+  {s:'USD/JPY',n:'Dollar/Yen',i:'¥',p:149.82,c:0.31,v:'$390B',cat:'forex'},
+  {s:'AUD/USD',n:'Aussie/Dollar',i:'A$',p:0.6521,c:-0.22,v:'$150B',cat:'forex'},
+  {s:'XAU/USD',n:'Gold',i:'🥇',p:2341.5,c:0.55,v:'$180B',cat:'metals'},
+  {s:'XAG/USD',n:'Silver',i:'🥈',p:27.43,c:1.12,v:'$12B',cat:'metals'},
+];
+const PATS=['Bull Flag','Bear Flag','Head & Shoulders','Double Top','Double Bottom','Ascending Triangle','Wedge','Cup & Handle','Engulfing Candle','Doji'];
+const ANA={
+  BUY:['Price broke above key resistance with strong volume confirmation. RSI momentum building with bullish divergence. MACD crossover signals upward pressure. Classic breakout pattern with favorable risk/reward.',
+    'Bullish engulfing at major support zone. Moving averages aligned in uptrend order. Volume spike confirms institutional buying. Stochastic oversold bounce adds confluence.',
+    'Higher highs and higher lows confirm uptrend. Pullback to EMA 20 offers high-probability entry. Multiple timeframe alignment confirms bullish bias.'],
+  SELL:['Price rejected at key resistance with bearish engulfing. RSI showing overbought divergence above 70. Volume declining on rallies — distribution forming.',
+    'Death cross forming with accelerating downside momentum. Lower highs and lower lows confirm bearish structure. MACD histogram declining — sellers in control.',
+    'Break below critical support with strong bearish volume. Price now facing resistance from prior support. Multiple indicators aligned bearishly.'],
+  HOLD:['Market consolidating in tight range with no clear directional bias. Volume declining — breakout likely imminent. Wait for confirmed close above resistance or below support.',
+    'Mixed signals across indicators. RSI neutral zone, MACD near zero. Market in decision mode. Patience is key — let price show its hand.',
+    'Price coiling inside symmetrical triangle. Measured move will be significant once resolved. Avoid premature entries — wait for breakout and retest.']
+};
+
+let ST={pair:'BTC/USDT',tf:'1H',trades:JSON.parse(localStorage.getItem('cfy2')||'[]'),last:null,mf:'all',px:{}};
+MKTS.forEach(m=>ST.px[m.s]={p:m.p,c:m.c});
+
+function goTab(t){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('p-'+t).classList.on='on';
+  document.getElementById('p-'+t).classList.add('on');
+  document.getElementById('t-'+t).classList.add('on');
+  if(t==='markets')renderMkts();
+  if(t==='history')renderHist();
+}
+
+function buildTicker(){
+  const h=MKTS.slice(0,8).map(m=>{const px=ST.px[m.s];return`<div class="ti"><span class="ts">${m.s}</span><span>${fp(px.p,m.s)}</span><span class="${px.c>=0?'up':'dn'}">${px.c>=0?'▲':'▼'}${Math.abs(px.c).toFixed(2)}%</span></div>`;}).join('');
+  document.getElementById('ticker').innerHTML=h+h;
+}
+
+function buildPGrid(){
+  const pairs=['BTC/USDT','ETH/USDT','SOL/USDT','EUR/USD','GBP/USD','XAU/USD'];
+  document.getElementById('pgrid').innerHTML=pairs.map(s=>{
+    const m=MKTS.find(x=>x.s===s);const px=ST.px[s];
+    return`<button class="pair-btn${s===ST.pair?' on':''}" onclick="setPair('${s}',this)"><b>${s}</b><small>${fp(px.p,s)}</small></button>`;
+  }).join('');
+}
+
+function setPair(s,b){ST.pair=s;document.querySelectorAll('.pair-btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');}
+function setTF(b,tf){ST.tf=tf;document.querySelectorAll('.tf').forEach(x=>x.classList.remove('on'));b.classList.add('on');}
+
+function onFile(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{document.getElementById('prev').src=ev.target.result;document.getElementById('prev').style.display='block';document.getElementById('rm').style.display='flex';};
+  r.readAsDataURL(f);
+}
+function onDrop(e){e.preventDefault();document.getElementById('uz').classList.remove('drag');const f=e.dataTransfer.files[0];if(f){document.getElementById('fi').files=e.dataTransfer.files;onFile({target:{files:[f]}});}}
+function rmImg(e){e.stopPropagation();document.getElementById('prev').style.display='none';document.getElementById('rm').style.display='none';document.getElementById('fi').value='';}
+
+function runScan(){
+  document.getElementById('loader').classList.add('on');
+  document.getElementById('result').classList.remove('on');
+  document.getElementById('scanBtn').disabled=true;
+  ['s1','s2','s3','s4','s5'].forEach(s=>document.getElementById(s).className='step');
+  let i=0;
+  const steps=['s1','s2','s3','s4','s5'];
+  const iv=setInterval(()=>{
+    if(i>0)document.getElementById(steps[i-1]).className='step done';
+    if(i<steps.length){document.getElementById(steps[i]).className='step act';i++;}
+    else{clearInterval(iv);setTimeout(()=>{document.getElementById('loader').classList.remove('on');showRes();document.getElementById('scanBtn').disabled=false;},400);}
+  },450);
+}
+
+function showRes(){
+  const sym=ST.pair,tf=ST.tf;
+  const m=MKTS.find(x=>x.s===sym)||MKTS[0];
+  const base=ST.px[sym].p;
+  const sigs=['BUY','BUY','SELL','HOLD'];
+  const sig=sigs[Math.floor(Math.random()*sigs.length)];
+  const iB=sig==='BUY',iS=sig==='SELL';
+  const conf=Math.floor(Math.random()*22+70);
+  const tp1=iB?(base*1.028):iS?(base*0.972):(base*1.01);
+  const tp2=iB?(base*1.055):iS?(base*0.945):(base*1.02);
+  const sl=iB?(base*0.982):iS?(base*1.018):(base*0.99);
+  const rr=(1.2+Math.random()*2).toFixed(1);
+  const rsi=(Math.random()*45+28).toFixed(1);
+  const macd=((Math.random()-0.4)*2).toFixed(3);
+  const pat=PATS[Math.floor(Math.random()*PATS.length)];
+  const trend=iB?'Uptrend':iS?'Downtrend':'Sideways';
+  const rls=['Low','Medium','High'];
+  const rl=rls[Math.floor(Math.random()*3)];
+  const rp=(Math.random()*3+0.5).toFixed(1);
+  const ana=ANA[sig][Math.floor(Math.random()*3)];
+  ST.last={sym,tf,sig,base,tp1,tp2,sl,conf,pat,trend,rr,rl,rp,ana};
+
+  const sc=document.getElementById('sigCard');
+  sc.className='sig-card '+(iB?'buy':iS?'sell':'hold');
+  const sn=document.getElementById('sigName');
+  sn.className='sig-name '+(iB?'buy':iS?'sell':'hold');
+  sn.textContent=iB?'⬆ BUY':iS?'⬇ SELL':'⏸ HOLD';
+  document.getElementById('sigMeta').textContent=`${sym} • ${tf}`;
+  document.getElementById('confNum').textContent=conf+'%';
+  document.getElementById('cfill').style.width=conf+'%';
+  document.getElementById('tagTF').textContent=tf;
+  document.getElementById('tagPat').textContent=pat;
+  document.getElementById('tagTrend').textContent=trend;
+
+  document.getElementById('lvlEntry').textContent=fp(base,sym);
+  document.getElementById('lvlTP1').textContent=fp(tp1,sym);
+  document.getElementById('lvlTP2').textContent=fp(tp2,sym);
+  document.getElementById('lvlSL').textContent=fp(sl,sym);
+
+  const B='pill bull',R='pill bear',N='pill neut';
+  document.getElementById('iRSI').textContent=rsi;
+  document.getElementById('pRSI').className=rsi>55?B:rsi<45?R:N;
+  document.getElementById('pRSI').textContent=rsi>70?'Overbought':rsi>55?'Bullish':rsi<30?'Oversold':rsi<45?'Bearish':'Neutral';
+  document.getElementById('iMACD').textContent=(macd>0?'+':'')+macd;
+  document.getElementById('pMACD').className=macd>0?B:R;
+  document.getElementById('pMACD').textContent=macd>0?'Bullish Cross':'Bearish Cross';
+  document.getElementById('iEMA').textContent=iB?'Above':iS?'Below':'Crossing';
+  document.getElementById('pEMA').className=iB?B:iS?R:N;
+  document.getElementById('pEMA').textContent=iB?'Uptrend':iS?'Downtrend':'Ranging';
+  const vols=['Low','Normal','High','Very High'];
+  const vol=vols[Math.floor(Math.random()*4)];
+  document.getElementById('iVol').textContent=vol;
+  document.getElementById('pVol').className=vol==='High'||vol==='Very High'?B:N;
+  document.getElementById('pVol').textContent=vol==='High'||vol==='Very High'?'Confirming':'Normal';
+  const bbs=['Lower Band','Mid Band','Upper Band'];
+  document.getElementById('iBB').textContent=bbs[Math.floor(Math.random()*3)];
+  document.getElementById('pBB').className=N;document.getElementById('pBB').textContent='Neutral';
+  const st=(Math.random()*80+10).toFixed(1);
+  document.getElementById('iStoch').textContent=st;
+  document.getElementById('pStoch').className=st>70?R:st<30?B:N;
+  document.getElementById('pStoch').textContent=st>70?'Overbought':st<30?'Oversold':'Neutral';
+
+  document.getElementById('rr').textContent='1:'+rr;
+  document.getElementById('rpct').textContent=rp+'%';
+  document.getElementById('rlvl').textContent=rl;
+  document.getElementById('rbar').style.width=rl==='Low'?'25%':rl==='Medium'?'55%':'85%';
+  document.getElementById('rbar').style.background=rl==='Low'?'var(--green)':rl==='Medium'?'var(--gold)':'var(--red)';
+  document.getElementById('aiText').textContent=ana;
+
+  const r=document.getElementById('result');
+  r.classList.add('on');
+  r.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function doTrade(type){
+  if(!ST.last){toast('Run analysis first!');return;}
+  const r=ST.last;
+  const pnl=parseFloat((Math.random()*400-150).toFixed(2));
+  const t={id:Date.now(),sym:r.sym,type,sig:r.sig,base:r.base,tp1:r.tp1,sl:r.sl,pnl,tf:r.tf,time:new Date().toLocaleString()};
+  ST.trades.unshift(t);
+  if(ST.trades.length>100)ST.trades.pop();
+  localStorage.setItem('cfy2',JSON.stringify(ST.trades));
+  toast(`✅ ${type} recorded for ${r.sym}`);
+}
+function saveSig(){
+  if(!ST.last){toast('No analysis to save!');return;}
+  const r=ST.last;
+  const t={id:Date.now(),sym:r.sym,type:'SAVE',sig:r.sig,base:r.base,tp1:r.tp1,sl:r.sl,pnl:0,tf:r.tf,time:new Date().toLocaleString()};
+  ST.trades.unshift(t);
+  localStorage.setItem('cfy2',JSON.stringify(ST.trades));
+  toast('✅ Analysis saved!');
+}
+
+function renderMkts(f,q){
+  f=f||ST.mf;q=q||'';
+  let list=MKTS;
+  if(f!=='all')list=list.filter(m=>m.cat===f);
+  if(q)list=list.filter(m=>m.s.toLowerCase().includes(q.toLowerCase())||m.n.toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('mklist').innerHTML=list.map(m=>{
+    const px=ST.px[m.s];
+    return`<div class="mkrow" onclick="goAnalyze('${m.s}')">
+      <div class="mkl"><div class="mkico">${m.i}</div><div><div class="mksym">${m.s}</div><div class="mknm">${m.n}</div></div></div>
+      <div class="mkr"><div class="mkp">${fp(px.p,m.s)}</div><div class="mkch ${px.c>=0?'cup':'cdn'}">${px.c>=0?'+':''}${px.c.toFixed(2)}%</div><div class="mkvol">Vol ${m.v}</div></div>
+    </div>`;
+  }).join('');
+}
+function goAnalyze(s){ST.pair=s;goTab('analyze');buildPGrid();toast(`Selected ${s}`);}
+function setMF(b,f){ST.mf=f;document.querySelectorAll('.mfbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderMkts(f);}
+function filterMkts(q){renderMkts(ST.mf,q);}
+
+function renderHist(){
+  const t=ST.trades;
+  if(!t.length){document.getElementById('hlist').innerHTML='<div class="empty"><span>📭</span><p>No trades yet.<br>Analyze a chart to get started.</p></div>';return;}
+  const total=t.reduce((s,x)=>s+x.pnl,0);
+  const wins=t.filter(x=>x.pnl>0).length;
+  const best=Math.max(...t.map(x=>x.pnl));
+  const wr=Math.round(wins/t.length*100);
+  document.getElementById('tPnl').textContent=(total>=0?'+$':'-$')+Math.abs(total).toFixed(2);
+  document.getElementById('tPnl').style.color=total>=0?'var(--green)':'var(--red)';
+  document.getElementById('pnlBadge').textContent=(total>=0?'+':'')+wr+'%';
+  document.getElementById('wRate').textContent=wr+'%';
+  document.getElementById('tTrades').textContent=t.length;
+  document.getElementById('bestT').textContent='+$'+Math.max(0,best).toFixed(2);
+  document.getElementById('hlist').innerHTML=t.map(x=>`
+    <div class="hitem">
+      <div class="hside ${x.type==='LONG'?'hlong':'hshort'}">${x.type==='LONG'?'▲':x.type==='SHORT'?'▼':'💾'}</div>
+      <div class="hinfo"><div class="hpair">${x.sym} <span style="font-size:10px;color:var(--muted)">${x.tf}</span></div><div class="hmeta">${x.time} • ${x.sig}</div></div>
+      <div class="hpnl"><div class="hpnlv ${x.pnl>=0?'up':'dn'}">${x.pnl>=0?'+':''}$${x.pnl.toFixed(2)}</div><div class="hent">Entry: ${fp(x.base,x.sym)}</div></div>
+    </div>`).join('');
+}
+
+function fp(n,s){
+  if(!n)return'—';
+  if(s&&(s.includes('XRP')||s.includes('DOGE')||s.includes('XAG')))return'$'+n.toFixed(4);
+  if(n>100)return'$'+n.toFixed(2);
+  if(n>1)return'$'+n.toFixed(4);
+  return'$'+n.toFixed(6);
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2800);}
+
+function tickPrices(){
+  Object.keys(ST.px).forEach(s=>{ST.px[s].p*=(1+(Math.random()-0.5)*0.001);ST.px[s].c+=((Math.random()-0.5)*0.05);ST.px[s].c=parseFloat(ST.px[s].c.toFixed(2));});
+  buildTicker();buildPGrid();
+}
+
+buildTicker();buildPGrid();renderMkts();
+setInterval(tickPrices,5000);
+</script>
+</body>
+</html>
